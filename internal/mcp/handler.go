@@ -26,6 +26,8 @@ type Handler struct {
 	perms    *permissions.Checker
 	sessions *SessionStore
 	registry *tools.Registry
+	// rawToken holds the Bearer token for the current request (threaded to admin tools).
+	rawToken string
 }
 
 // NewHandler creates a fully wired MCP handler.
@@ -44,7 +46,8 @@ func NewHandler(db *gorm.DB, cfg *config.Config) *Handler {
 // HandlePost handles POST /mcp — the main MCP request/response endpoint.
 func (h *Handler) HandlePost(c fiber.Ctx) error {
 	// Resolve caller identity (0 = anonymous).
-	userID := h.resolveUser(c)
+	userID, rawToken := h.resolveUser(c)
+	h.rawToken = rawToken
 
 	// Parse request body.
 	var req protocol.Request
@@ -200,7 +203,7 @@ func (h *Handler) handleToolCall(req protocol.Request, userID uint) (interface{}
 	}
 
 	args, _ := req.Params["arguments"].(map[string]interface{})
-	result, err := h.registry.Call(name, args, userID)
+	result, err := h.registry.Call(name, args, userID, h.rawToken)
 	if err != nil {
 		return nil, &protocol.RPCError{Code: protocol.CodeInternalError, Message: err.Error()}
 	}
@@ -209,8 +212,8 @@ func (h *Handler) handleToolCall(req protocol.Request, userID uint) (interface{}
 }
 
 // resolveUser extracts the user ID from the Authorization header or ?token= query param.
-// Returns 0 for anonymous callers.
-func (h *Handler) resolveUser(c fiber.Ctx) uint {
+// Returns (0, "") for anonymous callers.
+func (h *Handler) resolveUser(c fiber.Ctx) (uint, string) {
 	// Prefer Authorization header.
 	token := c.Get("Authorization")
 	if token == "" {
@@ -221,13 +224,13 @@ func (h *Handler) resolveUser(c fiber.Ctx) uint {
 	token = strings.TrimPrefix(token, "bearer ")
 	token = strings.TrimSpace(token)
 	if token == "" {
-		return 0
+		return 0, ""
 	}
 	userID, err := auth.ValidateToken(token, h.cfg, h.db)
 	if err != nil {
-		return 0
+		return 0, ""
 	}
-	return userID
+	return userID, token
 }
 
 // writeError writes a JSON-RPC error response.

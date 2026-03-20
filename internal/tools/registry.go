@@ -2,11 +2,19 @@ package tools
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/orchestra-mcp/cloud-mcp/internal/config"
 	"github.com/orchestra-mcp/cloud-mcp/internal/protocol"
 	"github.com/orchestra-mcp/cloud-mcp/internal/permissions"
 	"gorm.io/gorm"
+)
+
+// tokenStore holds the raw Bearer token per authenticated userID for the duration
+// of a tool call. Admin tools need to forward the token to the web API.
+var (
+	tokenStore = map[uint]string{}
+	tokenMu    sync.RWMutex
 )
 
 // Tool is a callable MCP tool.
@@ -39,6 +47,18 @@ func NewRegistry(db *gorm.DB, cfg *config.Config, perms *permissions.Checker) *R
 	r.register(newInstallPackTool(cfg))
 	r.register(newGetPackTool(cfg))
 
+	// Admin tools (only visible to users with role=admin).
+	r.register(newAdminPlatformStatsTool(db, cfg))
+	r.register(newAdminListUsersTool(db, cfg))
+	r.register(newAdminUpdateUserRoleTool(db, cfg))
+	r.register(newAdminGetSettingTool(db, cfg))
+	r.register(newAdminUpdateSettingTool(db, cfg))
+	r.register(newAdminSeedSettingsTool(db, cfg))
+	r.register(newAdminListPagesTool(db, cfg))
+	r.register(newAdminCreatePageTool(db, cfg))
+	r.register(newAdminUpdatePageTool(db, cfg))
+	r.register(newAdminSendNotificationTool(db, cfg))
+
 	return r
 }
 
@@ -57,8 +77,20 @@ func (r *Registry) List(userID uint) []protocol.ToolDefinition {
 	return defs
 }
 
-// Call dispatches a tool call by name.
-func (r *Registry) Call(name string, args map[string]interface{}, userID uint) (protocol.ToolResult, error) {
+// Call dispatches a tool call by name, forwarding the raw token for admin tools.
+func (r *Registry) Call(name string, args map[string]interface{}, userID uint, rawToken string) (protocol.ToolResult, error) {
+	// Store token so admin handlers can forward it to the web API.
+	if rawToken != "" && userID != 0 {
+		tokenMu.Lock()
+		tokenStore[userID] = rawToken
+		tokenMu.Unlock()
+		defer func() {
+			tokenMu.Lock()
+			delete(tokenStore, userID)
+			tokenMu.Unlock()
+		}()
+	}
+
 	for _, t := range r.tools {
 		if t.Definition.Name != name {
 			continue
@@ -70,7 +102,7 @@ func (r *Registry) Call(name string, args map[string]interface{}, userID uint) (
 				return protocol.ToolResult{
 					Content: []protocol.Content{{
 						Type: "text",
-						Text: fmt.Sprintf("This tool requires authentication. Add your Orchestra token at orchestra-mcp.dev/settings/mcp and reconnect with authorization."),
+						Text: "This tool requires authentication. Add your Orchestra token at orchestra-mcp.dev/settings/mcp and reconnect with authorization.",
 					}},
 					IsError: true,
 				}, nil

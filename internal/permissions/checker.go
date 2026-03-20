@@ -15,6 +15,7 @@ const (
 	PermProfileRead  = "mcp.profile.read"
 	PermProfileWrite = "mcp.profile.write"
 	PermMarketplace  = "mcp.marketplace"
+	PermAdmin        = "mcp.admin" // granted only to users with role=admin in the DB
 )
 
 // defaults maps each permission to its default enabled state.
@@ -87,6 +88,12 @@ func (c *Checker) load(userID uint) map[string]bool {
 	c.db.Where("user_id = ?", userID).Find(&rows)
 	for _, r := range rows {
 		perms[r.Permission] = r.Enabled
+	}
+
+	// Grant mcp.admin if the user's role is admin.
+	var u auth.User
+	if err := c.db.Select("role").First(&u, userID).Error; err == nil {
+		perms[PermAdmin] = u.Role == "admin"
 	}
 
 	c.cache[userID] = &cachedPerms{

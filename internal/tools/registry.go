@@ -19,9 +19,10 @@ var (
 
 // Tool is a callable MCP tool.
 type Tool struct {
-	Definition protocol.ToolDefinition
-	Permission string // "" = public (no auth needed)
-	Handler    func(args map[string]interface{}, userID uint) (protocol.ToolResult, error)
+	Definition   protocol.ToolDefinition
+	Permission   string // "" = public (no auth needed)
+	VisibleToAll bool   // if true, always show in tools/list even for unauthenticated users
+	Handler      func(args map[string]interface{}, userID uint) (protocol.ToolResult, error)
 }
 
 // Registry holds all registered tools and dispatches calls.
@@ -67,10 +68,21 @@ func (r *Registry) register(t Tool) {
 }
 
 // List returns tool definitions visible to the given user (filtered by permissions).
+// Tools with VisibleToAll=true are always included regardless of auth status.
+// Admin tools (mcp.admin permission) are only shown to admin users.
 func (r *Registry) List(userID uint) []protocol.ToolDefinition {
 	defs := make([]protocol.ToolDefinition, 0, len(r.tools))
 	for _, t := range r.tools {
-		if t.Permission == "" || r.perms.Can(userID, t.Permission) {
+		switch {
+		case t.Permission == "":
+			// Public tool — always visible.
+			defs = append(defs, t.Definition)
+		case t.VisibleToAll:
+			// Visible to all authenticated and unauthenticated users.
+			// Permission is enforced at call time, not list time.
+			defs = append(defs, t.Definition)
+		case r.perms.Can(userID, t.Permission):
+			// User has this permission.
 			defs = append(defs, t.Definition)
 		}
 	}

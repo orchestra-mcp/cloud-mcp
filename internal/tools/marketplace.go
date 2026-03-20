@@ -20,7 +20,8 @@ import (
 func newListPacksTool(cfg *config.Config) Tool {
 	readOnly := true
 	return Tool{
-		Permission: permissions.PermMarketplace,
+		Permission:   permissions.PermMarketplace,
+		VisibleToAll: true,
 		Definition: protocol.ToolDefinition{
 			Name:  "list_packs",
 			Title: "Browse Marketplace",
@@ -76,7 +77,8 @@ func newListPacksTool(cfg *config.Config) Tool {
 func newSearchPacksTool(cfg *config.Config) Tool {
 	readOnly := true
 	return Tool{
-		Permission: permissions.PermMarketplace,
+		Permission:   permissions.PermMarketplace,
+		VisibleToAll: true,
 		Definition: protocol.ToolDefinition{
 			Name:  "search_packs",
 			Title: "Search Marketplace",
@@ -129,7 +131,8 @@ func newSearchPacksTool(cfg *config.Config) Tool {
 func newGetPackTool(cfg *config.Config) Tool {
 	readOnly := true
 	return Tool{
-		Permission: permissions.PermMarketplace,
+		Permission:   permissions.PermMarketplace,
+		VisibleToAll: true,
 		Definition: protocol.ToolDefinition{
 			Name:  "get_pack",
 			Title: "Get Pack Details",
@@ -179,7 +182,8 @@ func newGetPackTool(cfg *config.Config) Tool {
 // Requires marketplace permission. Returns a shell script for Claude to run locally.
 func newInstallPackTool(cfg *config.Config) Tool {
 	return Tool{
-		Permission: permissions.PermMarketplace,
+		Permission:   permissions.PermMarketplace,
+		VisibleToAll: true,
 		Definition: protocol.ToolDefinition{
 			Name:  "install_pack",
 			Title: "Install Pack",

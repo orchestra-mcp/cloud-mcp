@@ -21,7 +21,8 @@ var httpClient = &http.Client{Timeout: 10 * time.Second}
 func newGetProfileTool(db *gorm.DB, cfg *config.Config) Tool {
 	readOnly := true
 	return Tool{
-		Permission: permissions.PermProfileRead,
+		Permission:   permissions.PermProfileRead,
+		VisibleToAll: true,
 		Definition: protocol.ToolDefinition{
 			Name:  "get_profile",
 			Title: "Get My Profile",
@@ -81,7 +82,8 @@ func newGetProfileTool(db *gorm.DB, cfg *config.Config) Tool {
 func newUpdateProfileTool(db *gorm.DB, cfg *config.Config) Tool {
 	idempotent := true
 	return Tool{
-		Permission: permissions.PermProfileWrite,
+		Permission:   permissions.PermProfileWrite,
+		VisibleToAll: true,
 		Definition: protocol.ToolDefinition{
 			Name:  "update_profile",
 			Title: "Update My Profile",

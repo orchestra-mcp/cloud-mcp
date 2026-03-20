@@ -26,8 +26,6 @@ type Handler struct {
 	perms    *permissions.Checker
 	sessions *SessionStore
 	registry *tools.Registry
-	// rawToken holds the Bearer token for the current request (threaded to admin tools).
-	rawToken string
 }
 
 // NewHandler creates a fully wired MCP handler.
@@ -47,7 +45,6 @@ func NewHandler(db *gorm.DB, cfg *config.Config) *Handler {
 func (h *Handler) HandlePost(c fiber.Ctx) error {
 	// Resolve caller identity (0 = anonymous).
 	userID, rawToken := h.resolveUser(c)
-	h.rawToken = rawToken
 
 	// Parse request body.
 	var req protocol.Request
@@ -60,7 +57,7 @@ func (h *Handler) HandlePost(c fiber.Ctx) error {
 	}
 
 	// Route to method handler.
-	result, rpcErr := h.dispatch(req, userID, c)
+	result, rpcErr := h.dispatch(req, userID, rawToken, c)
 	if rpcErr != nil {
 		return h.writeError(c, req.ID, rpcErr.Code, rpcErr.Message)
 	}
@@ -134,7 +131,7 @@ func (h *Handler) HandleGet(c fiber.Ctx) error {
 }
 
 // dispatch routes an RPC method to its handler.
-func (h *Handler) dispatch(req protocol.Request, userID uint, c fiber.Ctx) (interface{}, *protocol.RPCError) {
+func (h *Handler) dispatch(req protocol.Request, userID uint, rawToken string, c fiber.Ctx) (interface{}, *protocol.RPCError) {
 	switch req.Method {
 	case "initialize":
 		return h.handleInitialize(req, userID, c)
@@ -145,7 +142,7 @@ func (h *Handler) dispatch(req protocol.Request, userID uint, c fiber.Ctx) (inte
 	case "tools/list":
 		return h.handleToolsList(userID)
 	case "tools/call":
-		return h.handleToolCall(req, userID)
+		return h.handleToolCall(req, userID, rawToken)
 	default:
 		return nil, &protocol.RPCError{
 			Code:    protocol.CodeMethodNotFound,
@@ -192,7 +189,7 @@ func (h *Handler) handleToolsList(userID uint) (interface{}, *protocol.RPCError)
 }
 
 // handleToolCall dispatches a tool call and returns its result.
-func (h *Handler) handleToolCall(req protocol.Request, userID uint) (interface{}, *protocol.RPCError) {
+func (h *Handler) handleToolCall(req protocol.Request, userID uint, rawToken string) (interface{}, *protocol.RPCError) {
 	if req.Params == nil {
 		return nil, &protocol.RPCError{Code: protocol.CodeInvalidParams, Message: "params required"}
 	}
@@ -203,7 +200,7 @@ func (h *Handler) handleToolCall(req protocol.Request, userID uint) (interface{}
 	}
 
 	args, _ := req.Params["arguments"].(map[string]interface{})
-	result, err := h.registry.Call(name, args, userID, h.rawToken)
+	result, err := h.registry.Call(name, args, userID, rawToken)
 	if err != nil {
 		return nil, &protocol.RPCError{Code: protocol.CodeInternalError, Message: err.Error()}
 	}

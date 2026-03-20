@@ -66,8 +66,11 @@ jobs:
             [ -f /opt/orchestra/env/cloud-mcp.env ] && cp /opt/orchestra/env/cloud-mcp.env .env
             [ -f "$HOME/orchestra-cloud-mcp.env" ] && cp "$HOME/orchestra-cloud-mcp.env" .env
 
+            echo "--- Downloading modules ---"
+            GONOSUMDB='*' GOFLAGS='' go mod download
+
             echo "--- Building ---"
-            go build -buildvcs=false -ldflags="-s -w" -o bin/orchestra-cloud-mcp ./cmd/
+            GONOSUMDB='*' go build -buildvcs=false -ldflags="-s -w" -o bin/orchestra-cloud-mcp ./cmd/
 
             echo "--- Restarting service ---"
             sudo systemctl restart orchestra-cloud-mcp

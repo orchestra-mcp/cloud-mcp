@@ -1,6 +1,6 @@
 # Orchestra Cloud MCP
 
-Hosted personal MCP server for the [Orchestra](https://orchestra-mcp.com) platform, running at `mcp.orchestra-mcp.com`.
+Hosted personal MCP server for the [Orchestra](https://orchestra-mcp.com) platform, running at `orchestra-mcp.com/mcp`.
 
 Implements the **MCP 2025-11-25 Streamable HTTP transport** — connect Claude Desktop or any MCP client in one click.
 
@@ -26,7 +26,7 @@ All tools are user-controlled — toggle permissions on/off from `orchestra-mcp.
   "mcpServers": {
     "orchestra": {
       "type": "sse",
-      "url": "https://mcp.orchestra-mcp.com/mcp"
+      "url": "https://orchestra-mcp.com/mcp"
     }
   }
 }
@@ -45,7 +45,7 @@ Or manually:
   "mcpServers": {
     "orchestra": {
       "type": "sse",
-      "url": "https://mcp.orchestra-mcp.com/mcp",
+      "url": "https://orchestra-mcp.com/mcp",
       "headers": {
         "Authorization": "Bearer <your-token>"
       }

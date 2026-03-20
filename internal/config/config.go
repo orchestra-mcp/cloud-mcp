@@ -55,9 +55,9 @@ func Load() *Config {
 		}
 	} else {
 		allowedOrigins = []string{
-			"https://orchestra-mcp.com",
-			"https://www.orchestra-mcp.com",
-			"https://app.orchestra-mcp.com",
+			"https://orchestra-mcp.dev",
+			"https://www.orchestra-mcp.dev",
+			"https://app.orchestra-mcp.dev",
 			"http://localhost:3000",
 			"http://localhost:5173",
 		}
@@ -65,7 +65,7 @@ func Load() *Config {
 
 	webAPI := os.Getenv("WEB_API_BASE_URL")
 	if webAPI == "" {
-		webAPI = "https://orchestra-mcp.com/api"
+		webAPI = "https://orchestra-mcp.dev/api"
 	}
 
 	rateLimit := 10

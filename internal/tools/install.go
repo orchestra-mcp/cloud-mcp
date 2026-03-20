@@ -55,7 +55,7 @@ func newInstallOrchestralTool() Tool {
 
 			// Install Orchestra CLI.
 			sb.WriteString("# Install Orchestra MCP\n")
-			sb.WriteString("curl -fsSL https://orchestra-mcp.com/install.sh | sh\n\n")
+			sb.WriteString("curl -fsSL https://orchestra-mcp.dev/install.sh | sh\n\n")
 
 			// Initialize for target IDE.
 			sb.WriteString("# Initialize Orchestra for your project\n")

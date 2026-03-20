@@ -1,0 +1,126 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+
+concurrency:
+  group: deploy-cloud-mcp
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Cloud MCP
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 15
+
+    steps:
+      - name: Notify Discord — Deploy started
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          [ -z "$DISCORD_WEBHOOK" ] && exit 0
+          curl -s -X POST "$DISCORD_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "🚀 Deploy Started — Cloud MCP",
+                "description": "Cloud MCP deploy triggered by **${{ github.actor }}**",
+                "color": 3447003,
+                "fields": [
+                  {"name": "Branch", "value": "`${{ github.ref_name }}`", "inline": true},
+                  {"name": "Commit", "value": "`${{ github.sha }}`", "inline": true}
+                ],
+                "footer": {"text": "orchestra/cloud-mcp"}
+              }]
+            }'
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT }}
+          timeout: 600s
+          command_timeout: 600s
+          script: |
+            set -e
+            export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
+
+            DEPLOY_DIR="$HOME/orchestra-cloud-mcp"
+
+            echo "--- Ensuring deploy directory ---"
+            if [ ! -d "$DEPLOY_DIR/.git" ]; then
+              git clone https://github.com/orchestra-mcp/cloud-mcp.git "$DEPLOY_DIR"
+            fi
+
+            cd "$DEPLOY_DIR"
+
+            echo "--- Pulling latest ---"
+            git fetch origin master
+            git reset --hard origin/master
+
+            echo "--- Copying env ---"
+            [ -f /opt/orchestra/env/cloud-mcp.env ] && cp /opt/orchestra/env/cloud-mcp.env .env
+            [ -f "$HOME/orchestra-cloud-mcp.env" ] && cp "$HOME/orchestra-cloud-mcp.env" .env
+
+            echo "--- Building ---"
+            go build -buildvcs=false -ldflags="-s -w" -o bin/orchestra-cloud-mcp ./cmd/
+
+            echo "--- Restarting service ---"
+            sudo systemctl restart orchestra-cloud-mcp
+
+            echo "--- Health check ---"
+            sleep 3
+            for i in $(seq 1 15); do
+              curl -sf http://localhost:8091/health > /dev/null 2>&1 && echo "Cloud MCP: healthy" && break
+              [ "$i" -eq 15 ] && echo "FATAL: Cloud MCP health check failed" && sudo journalctl -u orchestra-cloud-mcp --no-pager -n 30 && exit 1
+              sleep 2
+            done
+
+            echo "--- Deploy complete ---"
+
+      - name: Notify Discord — Deploy succeeded
+        if: success()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          [ -z "$DISCORD_WEBHOOK" ] && exit 0
+          curl -s -X POST "$DISCORD_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "✅ Deploy Succeeded — Cloud MCP",
+                "description": "Orchestra Cloud MCP is live at mcp.orchestra-mcp.dev",
+                "color": 3066993,
+                "fields": [
+                  {"name": "Branch", "value": "`${{ github.ref_name }}`", "inline": true},
+                  {"name": "Actor", "value": "${{ github.actor }}", "inline": true}
+                ],
+                "footer": {"text": "orchestra/cloud-mcp"}
+              }]
+            }'
+
+      - name: Notify Discord — Deploy failed
+        if: failure()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          [ -z "$DISCORD_WEBHOOK" ] && exit 0
+          curl -s -X POST "$DISCORD_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "❌ Deploy Failed — Cloud MCP",
+                "description": "Cloud MCP deploy failed. Check the Actions log.",
+                "color": 15158332,
+                "fields": [
+                  {"name": "Branch", "value": "`${{ github.ref_name }}`", "inline": true},
+                  {"name": "Actor", "value": "${{ github.actor }}", "inline": true},
+                  {"name": "Run", "value": "[View logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})", "inline": false}
+                ],
+                "footer": {"text": "orchestra/cloud-mcp"}
+              }]
+            }'

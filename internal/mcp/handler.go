@@ -213,14 +213,16 @@ func (h *Handler) handleToolCall(req protocol.Request, userID uint) (interface{}
 	return result, nil
 }
 
-// resolveUser extracts the user ID from the Authorization header.
+// resolveUser extracts the user ID from the Authorization header or ?token= query param.
 // Returns 0 for anonymous callers.
 func (h *Handler) resolveUser(c fiber.Ctx) uint {
-	header := c.Get("Authorization")
-	if header == "" {
-		return 0
+	// Prefer Authorization header.
+	token := c.Get("Authorization")
+	if token == "" {
+		// Fall back to ?token= query param (used when pasting URL into Claude Desktop connectors dialog).
+		token = c.Query("token")
 	}
-	token := strings.TrimPrefix(header, "Bearer ")
+	token = strings.TrimPrefix(token, "Bearer ")
 	token = strings.TrimPrefix(token, "bearer ")
 	token = strings.TrimSpace(token)
 	if token == "" {

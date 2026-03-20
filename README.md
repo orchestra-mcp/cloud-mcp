@@ -24,7 +24,7 @@ All tools are user-controlled — toggle permissions on/off from `orchestra-mcp.
 ```json
 {
   "mcpServers": {
-    "orchestra": {
+    "orchestra-cloud": {
       "type": "sse",
       "url": "https://orchestra-mcp.dev/mcp"
     }
@@ -43,7 +43,7 @@ Or manually:
 ```json
 {
   "mcpServers": {
-    "orchestra": {
+    "orchestra-cloud": {
       "type": "sse",
       "url": "https://orchestra-mcp.dev/mcp",
       "headers": {

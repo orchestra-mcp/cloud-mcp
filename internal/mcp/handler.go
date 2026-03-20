@@ -169,16 +169,16 @@ func (h *Handler) handleInitialize(_ protocol.Request, userID uint, c fiber.Ctx)
 			Description: "Personal Orchestra MCP — manage your profile, install Orchestra, browse the marketplace, and control agent permissions from the web.",
 			Icons: []protocol.Icon{
 				{
-					Src:      "https://orchestra-mcp.dev/favicon.ico",
+					Src:      "https://orchestra-mcp.com/favicon.ico",
 					MimeType: "image/x-icon",
 				},
 				{
-					Src:      "https://orchestra-mcp.dev/icon-192.png",
+					Src:      "https://orchestra-mcp.com/icon-192.png",
 					MimeType: "image/png",
 					Sizes:    []string{"192x192"},
 				},
 			},
-			WebsiteURL: "https://orchestra-mcp.dev",
+			WebsiteURL: "https://orchestra-mcp.com",
 		},
 		SessionID: s.ID,
 	}

@@ -26,7 +26,7 @@ func newGetProfileTool(db *gorm.DB, cfg *config.Config) Tool {
 			Name:  "get_profile",
 			Title: "Get My Profile",
 			Description: "Retrieve the authenticated user's Orchestra profile including name, email, role, plan, " +
-				"timezone, and usage statistics. Requires the 'Read my profile' permission toggle to be ON at orchestra-mcp.dev/settings/mcp",
+				"timezone, and usage statistics. Requires the 'Read my profile' permission toggle to be ON at orchestra-mcp.com/settings/mcp",
 			InputSchema: map[string]interface{}{
 				"type":       "object",
 				"properties": map[string]interface{}{},
@@ -86,7 +86,7 @@ func newUpdateProfileTool(db *gorm.DB, cfg *config.Config) Tool {
 			Name:  "update_profile",
 			Title: "Update My Profile",
 			Description: "Update the authenticated user's Orchestra profile fields. " +
-				"Requires the 'Update my profile' permission toggle to be ON at orchestra-mcp.dev/settings/mcp",
+				"Requires the 'Update my profile' permission toggle to be ON at orchestra-mcp.com/settings/mcp",
 			InputSchema: map[string]interface{}{
 				"type": "object",
 				"properties": map[string]interface{}{

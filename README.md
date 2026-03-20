@@ -1,6 +1,6 @@
 # Orchestra Cloud MCP
 
-Hosted personal MCP server for the [Orchestra](https://orchestra-mcp.dev) platform, running at `mcp.orchestra-mcp.dev`.
+Hosted personal MCP server for the [Orchestra](https://orchestra-mcp.com) platform, running at `mcp.orchestra-mcp.com`.
 
 Implements the **MCP 2025-11-25 Streamable HTTP transport** — connect Claude Desktop or any MCP client in one click.
 
@@ -15,7 +15,7 @@ Orchestra Cloud MCP lets you control Orchestra from any MCP-compatible AI agent 
 - **Browse** and install packs, plugins, skills, agents, and workflows from the marketplace
 - **Read / update** your Orchestra profile (controlled by your permission toggles)
 
-All tools are user-controlled — toggle permissions on/off from `orchestra-mcp.dev/settings/mcp`.
+All tools are user-controlled — toggle permissions on/off from `orchestra-mcp.com/settings/mcp`.
 
 ## Quick Start
 
@@ -26,7 +26,7 @@ All tools are user-controlled — toggle permissions on/off from `orchestra-mcp.
   "mcpServers": {
     "orchestra": {
       "type": "sse",
-      "url": "https://mcp.orchestra-mcp.dev/mcp"
+      "url": "https://mcp.orchestra-mcp.com/mcp"
     }
   }
 }
@@ -34,7 +34,7 @@ All tools are user-controlled — toggle permissions on/off from `orchestra-mcp.
 
 ### Add with your account (full access)
 
-1. Log in at [orchestra-mcp.dev](https://orchestra-mcp.dev)
+1. Log in at [orchestra-mcp.com](https://orchestra-mcp.com)
 2. Go to **Settings → MCP Access**
 3. Click **Add to Claude Desktop** — pre-fills your token automatically
 
@@ -45,7 +45,7 @@ Or manually:
   "mcpServers": {
     "orchestra": {
       "type": "sse",
-      "url": "https://mcp.orchestra-mcp.dev/mcp",
+      "url": "https://mcp.orchestra-mcp.com/mcp",
       "headers": {
         "Authorization": "Bearer <your-token>"
       }
@@ -84,8 +84,8 @@ All configuration is via environment variables:
 | `PORT` | `8091` | HTTP listen port |
 | `DATABASE_URL` | `postgres://postgres:postgres@localhost:5432/orchestra_web?sslmode=disable` | PostgreSQL connection |
 | `JWT_SECRET` | _(change in production)_ | JWT signing secret (same as apps/web) |
-| `ALLOWED_ORIGINS` | `orchestra-mcp.dev,localhost:3000,...` | Comma-separated CORS origins |
-| `WEB_API_BASE_URL` | `https://api.orchestra-mcp.dev` | Orchestra Web API base URL |
+| `ALLOWED_ORIGINS` | `orchestra-mcp.com,localhost:3000,...` | Comma-separated CORS origins |
+| `WEB_API_BASE_URL` | `https://orchestra-mcp.com/api` | Orchestra Web API base URL |
 | `PUBLIC_RATE_LIMIT` | `10` | Requests/minute/IP for public tools |
 
 ## Project Structure

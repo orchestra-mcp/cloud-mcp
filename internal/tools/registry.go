@@ -70,7 +70,7 @@ func (r *Registry) Call(name string, args map[string]interface{}, userID uint) (
 				return protocol.ToolResult{
 					Content: []protocol.Content{{
 						Type: "text",
-						Text: fmt.Sprintf("This tool requires authentication. Add your Orchestra token at orchestra-mcp.dev/settings/mcp and reconnect with authorization."),
+						Text: fmt.Sprintf("This tool requires authentication. Add your Orchestra token at orchestra-mcp.com/settings/mcp and reconnect with authorization."),
 					}},
 					IsError: true,
 				}, nil
@@ -78,7 +78,7 @@ func (r *Registry) Call(name string, args map[string]interface{}, userID uint) (
 			return protocol.ToolResult{
 				Content: []protocol.Content{{
 					Type: "text",
-					Text: fmt.Sprintf("Permission denied. Enable \"%s\" at https://orchestra-mcp.dev/settings/mcp", t.Permission),
+					Text: fmt.Sprintf("Permission denied. Enable \"%s\" at https://orchestra-mcp.com/settings/mcp", t.Permission),
 				}},
 				IsError: true,
 			}, nil

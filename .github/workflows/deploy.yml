@@ -73,13 +73,19 @@ jobs:
             GONOSUMDB='*' go build -buildvcs=false -ldflags="-s -w" -o bin/orchestra-cloud-mcp ./cmd/
 
             echo "--- Restarting service ---"
-            sudo systemctl restart orchestra-cloud-mcp
+            if command -v pm2 &>/dev/null && pm2 list | grep -q "cloud-mcp"; then
+              pm2 restart cloud-mcp
+            elif sudo systemctl is-active --quiet orchestra-cloud-mcp 2>/dev/null; then
+              sudo systemctl restart orchestra-cloud-mcp
+            else
+              pm2 start bin/orchestra-cloud-mcp --name cloud-mcp --env-file .env || true
+            fi
 
             echo "--- Health check ---"
             sleep 3
             for i in $(seq 1 15); do
               curl -sf http://localhost:8091/health > /dev/null 2>&1 && echo "Cloud MCP: healthy" && break
-              [ "$i" -eq 15 ] && echo "FATAL: Cloud MCP health check failed" && sudo journalctl -u orchestra-cloud-mcp --no-pager -n 30 && exit 1
+              [ "$i" -eq 15 ] && echo "FATAL: Cloud MCP health check failed" && pm2 logs cloud-mcp --lines 30 --nostream 2>/dev/null; exit 1
               sleep 2
             done
 

@@ -56,6 +56,17 @@ func (h *Handler) HandlePost(c fiber.Ctx) error {
 		return h.writeError(c, req.ID, protocol.CodeInvalidRequest, "jsonrpc must be 2.0")
 	}
 
+	// If auth wasn't resolved from headers/params, fall back to session identity.
+	// Claude.ai sends the token only on 'initialize'; subsequent requests carry Mcp-Session-Id.
+	if userID == 0 {
+		if sessionID := c.Get("Mcp-Session-Id"); sessionID != "" {
+			if s, ok := h.sessions.Get(sessionID); ok && s.UserID != 0 {
+				userID = s.UserID
+				rawToken = s.RawToken
+			}
+		}
+	}
+
 	// Route to method handler.
 	result, rpcErr := h.dispatch(req, userID, rawToken, c)
 	if rpcErr != nil {
@@ -134,7 +145,7 @@ func (h *Handler) HandleGet(c fiber.Ctx) error {
 func (h *Handler) dispatch(req protocol.Request, userID uint, rawToken string, c fiber.Ctx) (interface{}, *protocol.RPCError) {
 	switch req.Method {
 	case "initialize":
-		return h.handleInitialize(req, userID, c)
+		return h.handleInitialize(req, userID, rawToken, c)
 	case "notifications/initialized":
 		return nil, nil
 	case "ping":
@@ -152,8 +163,8 @@ func (h *Handler) dispatch(req protocol.Request, userID uint, rawToken string, c
 }
 
 // handleInitialize responds to the MCP initialize handshake.
-func (h *Handler) handleInitialize(_ protocol.Request, userID uint, c fiber.Ctx) (interface{}, *protocol.RPCError) {
-	s := h.sessions.Create(userID)
+func (h *Handler) handleInitialize(_ protocol.Request, userID uint, rawToken string, c fiber.Ctx) (interface{}, *protocol.RPCError) {
+	s := h.sessions.Create(userID, rawToken)
 	c.Set("Mcp-Session-Id", s.ID)
 
 	result := protocol.InitializeResult{

@@ -10,7 +10,8 @@ import (
 // Session represents an active MCP SSE session.
 type Session struct {
 	ID        string
-	UserID    uint // 0 for anonymous
+	UserID    uint   // 0 for anonymous
+	RawToken  string // Bearer token from initialize — forwarded for admin tool calls
 	CreatedAt time.Time
 	LastSeen  time.Time
 	send      chan []byte
@@ -56,10 +57,11 @@ func NewSessionStore() *SessionStore {
 }
 
 // Create allocates and registers a new session. Returns the session.
-func (ss *SessionStore) Create(userID uint) *Session {
+func (ss *SessionStore) Create(userID uint, rawToken string) *Session {
 	s := &Session{
 		ID:        uuid.New().String(),
 		UserID:    userID,
+		RawToken:  rawToken,
 		CreatedAt: time.Now(),
 		LastSeen:  time.Now(),
 		send:      make(chan []byte, 64),

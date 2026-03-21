@@ -49,9 +49,16 @@ jobs:
             set -e
             export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
 
-            DEPLOY_DIR="$HOME/orchestra-cloud-mcp"
+            # Primary deploy dir is /opt/orchestra/cloud-mcp (set up by add-cloud-mcp.sh + systemd).
+            # Fall back to ~/orchestra-cloud-mcp if primary doesn't exist.
+            if [ -d "/opt/orchestra/cloud-mcp/.git" ]; then
+              DEPLOY_DIR="/opt/orchestra/cloud-mcp"
+            else
+              DEPLOY_DIR="$HOME/orchestra-cloud-mcp"
+              mkdir -p "$DEPLOY_DIR"
+            fi
 
-            echo "--- Ensuring deploy directory ---"
+            echo "--- Ensuring deploy directory ($DEPLOY_DIR) ---"
             if [ ! -d "$DEPLOY_DIR/.git" ]; then
               git clone https://github.com/orchestra-mcp/cloud-mcp.git "$DEPLOY_DIR"
             fi
@@ -70,22 +77,17 @@ jobs:
             GONOSUMDB='*' GOFLAGS='' go mod download
 
             echo "--- Building ---"
+            mkdir -p bin
             GONOSUMDB='*' go build -buildvcs=false -ldflags="-s -w" -o bin/orchestra-cloud-mcp ./cmd/
 
             echo "--- Restarting service ---"
-            if command -v pm2 &>/dev/null && pm2 list | grep -q "cloud-mcp"; then
-              pm2 restart cloud-mcp
-            elif sudo systemctl is-active --quiet orchestra-cloud-mcp 2>/dev/null; then
-              sudo systemctl restart orchestra-cloud-mcp
-            else
-              pm2 start bin/orchestra-cloud-mcp --name cloud-mcp --env-file .env || true
-            fi
+            sudo systemctl restart orchestra-cloud-mcp
 
             echo "--- Health check ---"
             sleep 3
             for i in $(seq 1 15); do
               curl -sf http://localhost:8091/health > /dev/null 2>&1 && echo "Cloud MCP: healthy" && break
-              [ "$i" -eq 15 ] && echo "FATAL: Cloud MCP health check failed" && pm2 logs cloud-mcp --lines 30 --nostream 2>/dev/null; exit 1
+              [ "$i" -eq 15 ] && echo "FATAL: Cloud MCP health check failed" && sudo journalctl -u orchestra-cloud-mcp --no-pager -n 30; exit 1
               sleep 2
             done
 

@@ -13,8 +13,9 @@ func newInstallOrchestralTool() Tool {
 	return Tool{
 		Permission: "", // public
 		Definition: protocol.ToolDefinition{
-			Name:  "install_orchestra",
-			Title: "Install Orchestra MCP",
+			Name:        "install_orchestra",
+			Title:       "Install Orchestra MCP",
+			Annotations: &protocol.ToolAnnotations{Title: "Install Orchestra MCP"},
 			Description: "Generate the shell commands to install Orchestra MCP on the user's machine and initialize it for their IDE. " +
 				"Returns shell commands for Claude to run locally.",
 			InputSchema: map[string]interface{}{
@@ -89,8 +90,9 @@ func newInstallDesktopTool() Tool {
 	return Tool{
 		Permission: "", // public
 		Definition: protocol.ToolDefinition{
-			Name:  "install_desktop_app",
-			Title: "Install Orchestra Desktop App",
+			Name:        "install_desktop_app",
+			Title:       "Install Orchestra Desktop App",
+			Annotations: &protocol.ToolAnnotations{Title: "Install Orchestra Desktop App"},
 			Description: "Generate platform-specific commands to download and install the Orchestra desktop app. " +
 				"Returns shell commands for Claude to run locally.",
 			InputSchema: map[string]interface{}{

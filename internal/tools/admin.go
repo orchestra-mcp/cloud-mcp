@@ -105,8 +105,9 @@ func adminTool(db *gorm.DB, cfg *config.Config, name, title, desc string, schema
 		Definition: protocol.ToolDefinition{
 			Name:        name,
 			Title:       title,
-			Description: "Admin: " + desc + " Requires admin role.",
+			Description: desc,
 			InputSchema: schema,
+			Annotations: &protocol.ToolAnnotations{Title: title},
 		},
 		Handler: func(args map[string]interface{}, userID uint) (protocol.ToolResult, error) {
 			token, err := getAdminToken(userID, db)

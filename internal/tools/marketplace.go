@@ -185,8 +185,9 @@ func newInstallPackTool(cfg *config.Config) Tool {
 		Permission:   permissions.PermMarketplace,
 		VisibleToAll: true,
 		Definition: protocol.ToolDefinition{
-			Name:  "install_pack",
-			Title: "Install Pack",
+			Name:        "install_pack",
+			Title:       "Install Pack",
+			Annotations: &protocol.ToolAnnotations{Title: "Install Pack"},
 			Description: "Generate the shell command to install an Orchestra pack on the user's machine. " +
 				"Packs add skills (slash commands), agents, hooks, and workflows to your AI workflow. " +
 				"Returns a shell command for Claude to run locally (requires Orchestra to be installed).",

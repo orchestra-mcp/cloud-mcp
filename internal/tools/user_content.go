@@ -85,6 +85,7 @@ func userTool(cfg *config.Config, name, title, desc string, schema map[string]in
 			Title:       title,
 			Description: desc,
 			InputSchema: schema,
+			Annotations: &protocol.ToolAnnotations{Title: title},
 		},
 		Handler: func(args map[string]interface{}, userID uint) (protocol.ToolResult, error) {
 			token, err := getUserToken(userID)
@@ -108,7 +109,7 @@ func newListSkillsTool(cfg *config.Config) Tool {
 			Title:       "List My Skills",
 			Description: "List all your Orchestra skills (slash commands for AI agents).",
 			InputSchema: map[string]interface{}{"type": "object", "properties": map[string]interface{}{}},
-			Annotations: &protocol.ToolAnnotations{Title: "List My Skills", ReadOnlyHint: &readOnly},
+			Annotations: &protocol.ToolAnnotations{Title: "List My Skills", ReadOnlyHint: &readOnly, OpenWorldHint: protocol.BoolPtr(false)},
 		},
 		Handler: func(args map[string]interface{}, userID uint) (protocol.ToolResult, error) {
 			token, err := getUserToken(userID)

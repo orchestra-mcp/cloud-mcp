@@ -69,6 +69,12 @@ func newGetProfileTool(db *gorm.DB, cfg *config.Config) Tool {
 			if bio := strField(profile, "bio"); bio != "" {
 				text += fmt.Sprintf("\n**Bio:** %s\n", bio)
 			}
+			if handle := strField(profile, "handle"); handle != "" {
+				text += fmt.Sprintf("**Profile URL:** /@%s\n", handle)
+			}
+			if about := strField(profile, "about"); about != "" {
+				text += fmt.Sprintf("\n---\n### About\n%s\n", about)
+			}
 
 			return protocol.ToolResult{
 				Content: []protocol.Content{{Type: "text", Text: text}},
@@ -118,7 +124,11 @@ func newUpdateProfileTool(db *gorm.DB, cfg *config.Config) Tool {
 					},
 					"bio": map[string]interface{}{
 						"type":        "string",
-						"description": "Short bio or description",
+						"description": "Short one-line bio or tagline",
+					},
+					"about": map[string]interface{}{
+						"type":        "string",
+						"description": "Full about page content in Markdown — rendered at /@handle/about",
 					},
 					"handle": map[string]interface{}{
 						"type":        "string",
@@ -170,7 +180,7 @@ func newUpdateProfileTool(db *gorm.DB, cfg *config.Config) Tool {
 		Handler: func(args map[string]interface{}, userID uint) (protocol.ToolResult, error) {
 			// Build update payload — only include provided fields.
 			update := map[string]interface{}{}
-			for _, field := range []string{"name", "email", "phone", "gender", "position", "timezone", "bio", "handle", "cover_url"} {
+			for _, field := range []string{"name", "email", "phone", "gender", "position", "timezone", "bio", "about", "handle", "cover_url"} {
 				if v, ok := args[field]; ok && v != nil {
 					if s, ok := v.(string); ok && s != "" {
 						update[field] = s

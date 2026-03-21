@@ -49,16 +49,87 @@ func NewRegistry(db *gorm.DB, cfg *config.Config, perms *permissions.Checker) *R
 	r.register(newGetPackTool(cfg))
 
 	// Admin tools (only visible to users with role=admin).
+	// Platform
 	r.register(newAdminPlatformStatsTool(db, cfg))
+	// Users
 	r.register(newAdminListUsersTool(db, cfg))
+	r.register(newAdminGetUserTool(db, cfg))
+	r.register(newAdminUpdateUserTool(db, cfg))
 	r.register(newAdminUpdateUserRoleTool(db, cfg))
-	r.register(newAdminGetSettingTool(db, cfg))
-	r.register(newAdminUpdateSettingTool(db, cfg))
-	r.register(newAdminSeedSettingsTool(db, cfg))
+	r.register(newAdminSuspendUserTool(db, cfg))
+	r.register(newAdminUnsuspendUserTool(db, cfg))
+	r.register(newAdminVerifyUserTool(db, cfg))
+	r.register(newAdminImpersonateTool(db, cfg))
+	r.register(newAdminForceResetPasswordTool(db, cfg))
+	r.register(newAdminGetLastOTPTool(db, cfg))
+	r.register(newAdminUpsertSubscriptionTool(db, cfg))
+	r.register(newAdminNotifyUserTool(db, cfg))
+	// Badges
+	r.register(newAdminListBadgesTool(db, cfg))
+	r.register(newAdminCreateBadgeTool(db, cfg))
+	r.register(newAdminUpdateBadgeTool(db, cfg))
+	r.register(newAdminDeleteBadgeTool(db, cfg))
+	r.register(newAdminAwardBadgeTool(db, cfg))
+	r.register(newAdminRevokeBadgeTool(db, cfg))
+	// Wallet / Points
+	r.register(newAdminGrantPointsTool(db, cfg))
+	r.register(newAdminGetPointsTool(db, cfg))
+	// Teams
+	r.register(newAdminListTeamsTool(db, cfg))
+	r.register(newAdminGetTeamTool(db, cfg))
+	r.register(newAdminUpdateTeamTool(db, cfg))
+	r.register(newAdminDeleteTeamTool(db, cfg))
+	r.register(newAdminAddTeamMemberTool(db, cfg))
+	r.register(newAdminRemoveTeamMemberTool(db, cfg))
+	// Marketplace approval
+	r.register(newAdminListPendingMarketplaceTool(db, cfg))
+	r.register(newAdminApproveMarketplaceTool(db, cfg))
+	r.register(newAdminRejectMarketplaceTool(db, cfg))
+	// Blog posts
+	r.register(newAdminListPostsTool(db, cfg))
+	r.register(newAdminCreatePostTool(db, cfg))
+	r.register(newAdminUpdatePostTool(db, cfg))
+	r.register(newAdminDeletePostTool(db, cfg))
+	// CMS pages
 	r.register(newAdminListPagesTool(db, cfg))
 	r.register(newAdminCreatePageTool(db, cfg))
 	r.register(newAdminUpdatePageTool(db, cfg))
+	r.register(newAdminDeletePageTool(db, cfg))
+	// Categories
+	r.register(newAdminListCategoriesTool(db, cfg))
+	r.register(newAdminCreateCategoryTool(db, cfg))
+	r.register(newAdminDeleteCategoryTool(db, cfg))
+	// Sponsors
+	r.register(newAdminListSponsorsTool(db, cfg))
+	r.register(newAdminCreateSponsorTool(db, cfg))
+	r.register(newAdminUpdateSponsorTool(db, cfg))
+	r.register(newAdminDeleteSponsorTool(db, cfg))
+	// Community
+	r.register(newAdminListCommunityPostsTool(db, cfg))
+	r.register(newAdminUpdateCommunityPostTool(db, cfg))
+	r.register(newAdminDeleteCommunityPostTool(db, cfg))
+	// Issues
+	r.register(newAdminListIssuesTool(db, cfg))
+	r.register(newAdminUpdateIssueTool(db, cfg))
+	// Contact
+	r.register(newAdminListContactTool(db, cfg))
+	r.register(newAdminDeleteContactTool(db, cfg))
+	// Notifications
 	r.register(newAdminSendNotificationTool(db, cfg))
+	r.register(newAdminListNotificationsTool(db, cfg))
+	// Content moderation
+	r.register(newAdminListContentTool(db, cfg))
+	r.register(newAdminUpdateContentVisibilityTool(db, cfg))
+	r.register(newAdminDeleteContentTool(db, cfg))
+	// Settings (all keys)
+	r.register(newAdminGetSettingTool(db, cfg))
+	r.register(newAdminUpdateSettingTool(db, cfg))
+	r.register(newAdminSeedSettingsTool(db, cfg))
+	r.register(newAdminTestEmailTool(db, cfg))
+	r.register(newAdminGenerateSitemapTool(db, cfg))
+	// GitHub sync
+	r.register(newAdminListGitHubReposTool(db, cfg))
+	r.register(newAdminSyncGitHubIssuesTool(db, cfg))
 
 	return r
 }

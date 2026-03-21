@@ -130,6 +130,13 @@ func NewRegistry(db *gorm.DB, cfg *config.Config, perms *permissions.Checker) *R
 	// GitHub sync
 	r.register(newAdminListGitHubReposTool(db, cfg))
 	r.register(newAdminSyncGitHubIssuesTool(db, cfg))
+	// Framework docs (/docs page)
+	r.register(newAdminListDocsTool(db, cfg))
+	r.register(newAdminGetDocTool(db, cfg))
+	r.register(newAdminCreateDocTool(db, cfg))
+	r.register(newAdminUpdateDocTool(db, cfg))
+	r.register(newAdminPinDocTool(db, cfg))
+	r.register(newAdminDeleteDocTool(db, cfg))
 
 	// User content tools (skills, agents, workflows, notes, API collections, presentations, community posts, shares).
 	r.register(newListSkillsTool(cfg))

@@ -1120,5 +1120,91 @@ func newAdminSyncGitHubIssuesTool(db *gorm.DB, cfg *config.Config) Tool {
 		})
 }
 
+// ── Admin Docs (framework documentation) ──────────────────────────────────────
+
+func newAdminListDocsTool(db *gorm.DB, cfg *config.Config) Tool {
+	return adminTool(db, cfg, "admin_list_docs", "List Framework Docs",
+		"List all framework documentation pages (the /docs section of the site).",
+		objSchema(map[string]interface{}{
+			"category": strProp("Filter by category (optional)"),
+		}),
+		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
+			path := "/api/docs"
+			if cat, _ := args["category"].(string); cat != "" {
+				path += "?category=" + cat
+			}
+			return adminFetchText(cfg.WebAPIBaseURL, http.MethodGet, path, token, nil)
+		})
+}
+
+func newAdminGetDocTool(db *gorm.DB, cfg *config.Config) Tool {
+	return adminTool(db, cfg, "admin_get_doc", "Get Framework Doc",
+		"Get a single framework documentation page by ID.",
+		objSchema(map[string]interface{}{
+			"id": strProp("Doc ID"),
+		}, "id"),
+		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
+			return adminFetchText(cfg.WebAPIBaseURL, http.MethodGet, fmt.Sprintf("/api/docs/%v", args["id"]), token, nil)
+		})
+}
+
+func newAdminCreateDocTool(db *gorm.DB, cfg *config.Config) Tool {
+	return adminTool(db, cfg, "admin_create_doc", "Create Framework Doc",
+		"Create a new framework documentation page.",
+		objSchema(map[string]interface{}{
+			"title":    strProp("Doc title"),
+			"body":     strProp("Doc content (Markdown)"),
+			"category": strProp("Category for grouping (e.g. guides, api, reference)"),
+			"icon":     strProp("Icon emoji or identifier"),
+			"color":    strProp("Color code or name"),
+			"pinned":   boolProp("Pin this doc"),
+			"published": boolProp("Publish publicly"),
+		}, "title", "body"),
+		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
+			return adminFetchText(cfg.WebAPIBaseURL, http.MethodPost, "/api/docs", token, args)
+		})
+}
+
+func newAdminUpdateDocTool(db *gorm.DB, cfg *config.Config) Tool {
+	return adminTool(db, cfg, "admin_update_doc", "Update Framework Doc",
+		"Update an existing framework documentation page.",
+		objSchema(map[string]interface{}{
+			"id":       strProp("Doc ID"),
+			"title":    strProp("New title"),
+			"body":     strProp("New content (Markdown)"),
+			"category": strProp("New category"),
+			"icon":     strProp("New icon"),
+			"color":    strProp("New color"),
+			"published": boolProp("Publish/unpublish"),
+		}, "id"),
+		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
+			id := args["id"]
+			delete(args, "id")
+			return adminFetchText(cfg.WebAPIBaseURL, http.MethodPut, fmt.Sprintf("/api/docs/%v", id), token, args)
+		})
+}
+
+func newAdminPinDocTool(db *gorm.DB, cfg *config.Config) Tool {
+	return adminTool(db, cfg, "admin_pin_doc", "Pin/Unpin Framework Doc",
+		"Toggle the pinned state of a framework documentation page.",
+		objSchema(map[string]interface{}{
+			"id": strProp("Doc ID"),
+		}, "id"),
+		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
+			return adminFetchText(cfg.WebAPIBaseURL, http.MethodPatch, fmt.Sprintf("/api/docs/%v/pin", args["id"]), token, map[string]interface{}{})
+		})
+}
+
+func newAdminDeleteDocTool(db *gorm.DB, cfg *config.Config) Tool {
+	return adminTool(db, cfg, "admin_delete_doc", "Delete Framework Doc",
+		"Delete a framework documentation page by ID.",
+		objSchema(map[string]interface{}{
+			"id": strProp("Doc ID"),
+		}, "id"),
+		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
+			return adminFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/docs/%v", args["id"]), token, nil)
+		})
+}
+
 // suppress unused import warning for boolProp
 var _ = boolProp

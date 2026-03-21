@@ -15,7 +15,8 @@ const (
 	PermProfileRead  = "mcp.profile.read"
 	PermProfileWrite = "mcp.profile.write"
 	PermMarketplace  = "mcp.marketplace"
-	PermAdmin        = "mcp.admin" // granted only to users with role=admin in the DB
+	PermContent      = "mcp.content" // skills, agents, workflows, notes, collections, posts
+	PermAdmin        = "mcp.admin"   // granted only to users with role=admin in the DB
 )
 
 // defaults maps each permission to its default enabled state.
@@ -25,6 +26,7 @@ var defaults = map[string]bool{
 	PermProfileRead:  true,
 	PermProfileWrite: false,
 	PermMarketplace:  true,
+	PermContent:      true,
 }
 
 // cachedPerms is a simple in-process cache entry.

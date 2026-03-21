@@ -65,8 +65,10 @@ func Load() *Config {
 
 	webAPI := os.Getenv("WEB_API_BASE_URL")
 	if webAPI == "" {
-		webAPI = "https://orchestra-mcp.dev/api"
+		webAPI = "https://orchestra-mcp.dev"
 	}
+	// Strip trailing /api if misconfigured in env — tools append /api/... themselves.
+	webAPI = strings.TrimSuffix(strings.TrimRight(webAPI, "/"), "/api")
 
 	rateLimit := 10
 	if r := os.Getenv("PUBLIC_RATE_LIMIT"); r != "" {

@@ -160,7 +160,7 @@ func newGetSkillTool(cfg *config.Config) Tool {
 			if err != nil {
 				return errResult(err.Error()), nil
 			}
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodGet, fmt.Sprintf("/api/skills%v", args["id"]), token, nil)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodGet, fmt.Sprintf("/api/skills/%v", args["id"]), token, nil)
 		},
 	}
 }
@@ -181,7 +181,7 @@ func newUpdateSkillTool(cfg *config.Config) Tool {
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
 			id := args["id"]
 			delete(args, "id")
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodPut, fmt.Sprintf("/api/skills%v", id), token, args)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodPut, fmt.Sprintf("/api/skills/%v", id), token, args)
 		},
 	)
 }
@@ -194,7 +194,7 @@ func newDeleteSkillTool(cfg *config.Config) Tool {
 			"required":   []string{"id"},
 		},
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/skills%v", args["id"]), token, nil)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/skills/%v", args["id"]), token, nil)
 		},
 	)
 }
@@ -263,7 +263,7 @@ func newGetAgentTool(cfg *config.Config) Tool {
 			if err != nil {
 				return errResult(err.Error()), nil
 			}
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodGet, fmt.Sprintf("/api/agents%v", args["id"]), token, nil)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodGet, fmt.Sprintf("/api/agents/%v", args["id"]), token, nil)
 		},
 	}
 }
@@ -285,7 +285,7 @@ func newUpdateAgentTool(cfg *config.Config) Tool {
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
 			id := args["id"]
 			delete(args, "id")
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodPut, fmt.Sprintf("/api/agents%v", id), token, args)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodPut, fmt.Sprintf("/api/agents/%v", id), token, args)
 		},
 	)
 }
@@ -298,7 +298,7 @@ func newDeleteAgentTool(cfg *config.Config) Tool {
 			"required":   []string{"id"},
 		},
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/agents%v", args["id"]), token, nil)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/agents/%v", args["id"]), token, nil)
 		},
 	)
 }
@@ -366,7 +366,7 @@ func newGetWorkflowTool(cfg *config.Config) Tool {
 			if err != nil {
 				return errResult(err.Error()), nil
 			}
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodGet, fmt.Sprintf("/api/workflows%v", args["id"]), token, nil)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodGet, fmt.Sprintf("/api/workflows/%v", args["id"]), token, nil)
 		},
 	}
 }
@@ -387,7 +387,7 @@ func newUpdateWorkflowTool(cfg *config.Config) Tool {
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
 			id := args["id"]
 			delete(args, "id")
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodPatch, fmt.Sprintf("/api/workflows%v", id), token, args)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodPatch, fmt.Sprintf("/api/workflows/%v", id), token, args)
 		},
 	)
 }
@@ -400,7 +400,7 @@ func newDeleteWorkflowTool(cfg *config.Config) Tool {
 			"required":   []string{"id"},
 		},
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/workflows%v", args["id"]), token, nil)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/workflows/%v", args["id"]), token, nil)
 		},
 	)
 }
@@ -461,7 +461,7 @@ func newUpdateNoteTool(cfg *config.Config) Tool {
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
 			id := args["id"]
 			delete(args, "id")
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodPut, fmt.Sprintf("/api/notes%v", id), token, args)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodPut, fmt.Sprintf("/api/notes/%v", id), token, args)
 		},
 	)
 }
@@ -474,7 +474,7 @@ func newDeleteNoteTool(cfg *config.Config) Tool {
 			"required":   []string{"id"},
 		},
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/notes%v", args["id"]), token, nil)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/notes/%v", args["id"]), token, nil)
 		},
 	)
 }
@@ -542,7 +542,7 @@ func newGetAPICollectionTool(cfg *config.Config) Tool {
 			if err != nil {
 				return errResult(err.Error()), nil
 			}
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodGet, fmt.Sprintf("/api/api-collections%v", args["id"]), token, nil)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodGet, fmt.Sprintf("/api/api-collections/%v", args["id"]), token, nil)
 		},
 	}
 }
@@ -578,7 +578,7 @@ func newDeleteAPICollectionTool(cfg *config.Config) Tool {
 			"required":   []string{"id"},
 		},
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/api-collections%v", args["id"]), token, nil)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/api-collections/%v", args["id"]), token, nil)
 		},
 	)
 }
@@ -652,7 +652,7 @@ func newDeletePresentationTool(cfg *config.Config) Tool {
 			"required":   []string{"id"},
 		},
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/presentations%v", args["id"]), token, nil)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodDelete, fmt.Sprintf("/api/presentations/%v", args["id"]), token, nil)
 		},
 	)
 }

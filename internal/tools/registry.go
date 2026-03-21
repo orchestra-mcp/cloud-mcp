@@ -138,6 +138,26 @@ func NewRegistry(db *gorm.DB, cfg *config.Config, perms *permissions.Checker) *R
 	r.register(newAdminPinDocTool(db, cfg))
 	r.register(newAdminDeleteDocTool(db, cfg))
 
+	// Settings tools (preferences, notifications, API keys, sessions, integrations, etc.).
+	r.register(newGetPreferencesTool(cfg))
+	r.register(newUpdatePreferencesTool(cfg))
+	r.register(newListNotificationsTool(cfg))
+	r.register(newMarkNotificationReadTool(cfg))
+	r.register(newMarkAllNotificationsReadTool(cfg))
+	r.register(newDeleteNotificationTool(cfg))
+	r.register(newListAPIKeysTool(cfg))
+	r.register(newCreateAPIKeyTool(cfg))
+	r.register(newRevokeAPIKeyTool(cfg))
+	r.register(newListSessionsTool(cfg))
+	r.register(newRevokeSessionTool(cfg))
+	r.register(newListConnectedAccountsTool(cfg))
+	r.register(newUnlinkAccountTool(cfg))
+	r.register(newListIntegrationsTool(cfg))
+	r.register(newUpsertIntegrationTool(cfg))
+	r.register(newDeleteIntegrationTool(cfg))
+	r.register(newListMyIssuesTool(cfg))
+	r.register(newCreateIssueTool(cfg))
+
 	// User content tools (skills, agents, workflows, notes, API collections, presentations, community posts, shares).
 	r.register(newListSkillsTool(cfg))
 	r.register(newCreateSkillTool(cfg))

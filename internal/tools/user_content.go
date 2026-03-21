@@ -565,7 +565,7 @@ func newAddAPIEndpointTool(cfg *config.Config) Tool {
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
 			id := args["collection_id"]
 			delete(args, "collection_id")
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodPost, fmt.Sprintf("/api/api-collections%v/endpoints", id), token, args)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodPost, fmt.Sprintf("/api/api-collections/%v/endpoints", id), token, args)
 		},
 	)
 }
@@ -639,7 +639,7 @@ func newAddSlideTool(cfg *config.Config) Tool {
 		func(args map[string]interface{}, token string) (protocol.ToolResult, error) {
 			id := args["presentation_id"]
 			delete(args, "presentation_id")
-			return userFetchText(cfg.WebAPIBaseURL, http.MethodPost, fmt.Sprintf("/api/presentations%v/slides", id), token, args)
+			return userFetchText(cfg.WebAPIBaseURL, http.MethodPost, fmt.Sprintf("/api/presentations/%v/slides", id), token, args)
 		},
 	)
 }

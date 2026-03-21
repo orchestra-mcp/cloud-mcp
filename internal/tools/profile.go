@@ -87,7 +87,7 @@ func newUpdateProfileTool(db *gorm.DB, cfg *config.Config) Tool {
 		Definition: protocol.ToolDefinition{
 			Name:  "update_profile",
 			Title: "Update My Profile",
-			Description: "Update the authenticated user's Orchestra profile fields. " +
+			Description: "Update the authenticated user's Orchestra profile — name, bio, social links, handle, privacy toggles, appearance, and more. " +
 				"Requires the 'Update my profile' permission toggle to be ON at orchestra-mcp.dev/settings/mcp",
 			InputSchema: map[string]interface{}{
 				"type": "object",
@@ -96,17 +96,69 @@ func newUpdateProfileTool(db *gorm.DB, cfg *config.Config) Tool {
 						"type":        "string",
 						"description": "Display name",
 					},
+					"email": map[string]interface{}{
+						"type":        "string",
+						"description": "Email address",
+					},
+					"phone": map[string]interface{}{
+						"type":        "string",
+						"description": "Phone number",
+					},
+					"gender": map[string]interface{}{
+						"type":        "string",
+						"description": "Gender",
+					},
+					"position": map[string]interface{}{
+						"type":        "string",
+						"description": "Job title / position",
+					},
 					"timezone": map[string]interface{}{
 						"type":        "string",
 						"description": "IANA timezone (e.g. America/New_York, Europe/Paris)",
 					},
-					"github_username": map[string]interface{}{
-						"type":        "string",
-						"description": "GitHub username (without @)",
-					},
 					"bio": map[string]interface{}{
 						"type":        "string",
 						"description": "Short bio or description",
+					},
+					"handle": map[string]interface{}{
+						"type":        "string",
+						"description": "Public profile handle / username (used in public profile URL)",
+					},
+					"cover_url": map[string]interface{}{
+						"type":        "string",
+						"description": "URL of the profile cover/banner image",
+					},
+					"social_links": map[string]interface{}{
+						"type":        "object",
+						"description": "Social links object — keys: twitter, linkedin, github, instagram, website, youtube, etc.",
+					},
+					"public_profile_enabled": map[string]interface{}{
+						"type":        "boolean",
+						"description": "Whether the public profile page is enabled",
+					},
+					"show_badges": map[string]interface{}{
+						"type":        "boolean",
+						"description": "Show badges on public profile",
+					},
+					"show_wallet": map[string]interface{}{
+						"type":        "boolean",
+						"description": "Show wallet/points on public profile",
+					},
+					"show_teams": map[string]interface{}{
+						"type":        "boolean",
+						"description": "Show team memberships on public profile",
+					},
+					"show_sponsors": map[string]interface{}{
+						"type":        "boolean",
+						"description": "Show sponsors section on public profile",
+					},
+					"show_comments_on_profile": map[string]interface{}{
+						"type":        "boolean",
+						"description": "Allow comments on public profile",
+					},
+					"appearance": map[string]interface{}{
+						"type":        "object",
+						"description": "Appearance/theme customization object for public profile",
 					},
 				},
 			},
@@ -118,11 +170,21 @@ func newUpdateProfileTool(db *gorm.DB, cfg *config.Config) Tool {
 		Handler: func(args map[string]interface{}, userID uint) (protocol.ToolResult, error) {
 			// Build update payload — only include provided fields.
 			update := map[string]interface{}{}
-			for _, field := range []string{"name", "timezone", "github_username", "bio"} {
+			for _, field := range []string{"name", "email", "phone", "gender", "position", "timezone", "bio", "handle", "cover_url"} {
 				if v, ok := args[field]; ok && v != nil {
 					if s, ok := v.(string); ok && s != "" {
 						update[field] = s
 					}
+				}
+			}
+			for _, field := range []string{"public_profile_enabled", "show_badges", "show_wallet", "show_teams", "show_sponsors", "show_comments_on_profile"} {
+				if v, ok := args[field]; ok && v != nil {
+					update[field] = v
+				}
+			}
+			for _, field := range []string{"social_links", "appearance"} {
+				if v, ok := args[field]; ok && v != nil {
+					update[field] = v
 				}
 			}
 
